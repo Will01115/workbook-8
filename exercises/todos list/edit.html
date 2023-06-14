@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todos</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
+    />
+  </head>
+  <body>
+    <main class="container">
+      <article>
+        <hgroup>
+          <h1>Todo</h1>
+          <h2>Edit the Todo</h2>
+        </hgroup>
+        <form onsubmit="handleSubmit(event);">
+          <div class="grid">
+            <label for="userId"
+              >UserId
+              <input type="text" id="userId" name="userId" />
+            </label>
+          </div>
+          <div class="grid">
+            <label for="title"
+              >Title
+              <input type="text" id="title" name="title" />
+            </label>
+          </div>
+
+          <div class="grid">
+            <label for="completed"
+              >Completed
+              <input type="text" id="completed" name="completed" />
+            </label>
+          </div>
+          <div class="action-bar">
+            <div></div>
+            <button type="submit">Save</button>
+            <a href="list.html" class="cancel contrast outline" role="buton"
+              >Cancel</a
+            >
+          </div>
+        </form>
+      </article>
+    </main>
+    <script>
+      "use strict";
+      const userIdInput = document.querySelector("#userId");
+      const titleInput = document.querySelector("#title");
+      const completedInput = document.querySelector("#completed");
+
+      function getTodoId() {
+        const searchParameters = new URLSearchParams(window.location.search);
+        if (!searchParameters.has("todoId")) {
+          throw new Error("No Todo ID provided.");
+        }
+        const todoId = searchParameters.get("todoId");
+        return todoId;
+      }
+
+      function loadPage() {
+        const todoId = getTodoId();
+        fetch(`http://localhost:3000/todos/${todoId}`)
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (todo) {
+            userIdInput.value = todo.userId;
+            titleInput.value = todo.title;
+            completedInput.value = todo.completed;
+          });
+      }
+      loadPage();
+
+      function handleSubmit(e) {
+        e.preventDefault();
+
+        let todo = {
+          userId: userIdInput.value,
+          title: titleInput.value,
+          completed: completedInput.value,
+        };
+
+        const todoId = getTodoId();
+
+        fetch(`http://localhost:3000/todos/${todoId}`, {
+          method: "PUT",
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify(todo),
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (todo) {
+            window.location.replace("list.html");
+          });
+      }
+    </script>
+  </body>
+</html>

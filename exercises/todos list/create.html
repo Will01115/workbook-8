@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Todos</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.classless.min.css"
+    />
+  </head>
+  <body>
+    <main>
+      <h1>Create Todos</h1>
+      <form onsubmit="handleSubmit(event)">
+        <label for="userId">UserId</label>
+        <input type="text" id="userId" name="userId" />
+
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" />
+
+        <label for="completed">Completed</label>
+        <input type="text" id="completed" name="completed" />
+
+        <button type="submit">Create</button>
+      </form>
+    </main>
+    <script>
+      function handleSubmit(event) {
+        event.preventDefault();
+
+        let form = event.target;
+        let formData = new FormData(form);
+        let todo = Object.fromEntries(formData.entries());
+
+        fetch("http://localhost:3000/todos", {
+          method: "POST",
+          headers: { "Content-type": "application/json" },
+          body: JSON.stringify(todo),
+        })
+          .then(function (response) {
+            console.log(response.status, response.statusText);
+            return response.json();
+          })
+          .then(function (todo) {
+            console.log(todo);
+            window.location.replace("list.html");
+          });
+      }
+    </script>
+  </body>
+</html>
